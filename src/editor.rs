@@ -1,14 +1,12 @@
-use std::io::{stdout, Error};
+mod terminal;
+use std::io::Error;
+use terminal::Terminal;
 
-use crossterm::{
-    event::{
-        read,
-        Event::{self, Key},
-        KeyCode::Char,
-        KeyEvent, KeyModifiers,
-    },
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
+use crossterm::event::{
+    read,
+    Event::{self, Key},
+    KeyCode::Char,
+    KeyEvent, KeyModifiers,
 };
 
 pub struct Editor {
@@ -20,21 +18,11 @@ impl Editor {
         Editor { should_quit: false }
     }
     pub fn run(&mut self) {
-        Self::initialize().unwrap();
+        Terminal::initialize().unwrap();
+        Terminal::draw_rows().unwrap();
         let result = self.repl();
-        Self::terminate().unwrap();
+        Terminal::terminate().unwrap();
         result.unwrap();
-    }
-    fn initialize() -> Result<(), Error> {
-        enable_raw_mode()?;
-        Self::clear_screen()
-    }
-    fn clear_screen() -> Result<(), Error> {
-        let mut stdout = stdout();
-        execute!(stdout, Clear(ClearType::All))
-    }
-    fn terminate() -> Result<(), Error> {
-        disable_raw_mode()
     }
     fn repl(&mut self) -> Result<(), Error> {
         loop {
@@ -62,7 +50,7 @@ impl Editor {
     }
     fn refresh_screen(&self) -> Result<(), Error> {
         if self.should_quit {
-            Self::clear_screen()?;
+            Terminal::clear_screen()?;
             print!("Goodbye. \r\n");
         }
         Ok(())
