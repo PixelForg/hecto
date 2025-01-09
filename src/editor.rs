@@ -39,7 +39,7 @@ impl Editor {
     fn repl(&mut self) -> Result<(), Error> {
         loop {
             let event = read()?;
-            self.evaluate_event(event);
+            self.evaluate_event(&event);
             self.refresh_screen()?;
             if self.should_quit {
                 break;
@@ -47,13 +47,13 @@ impl Editor {
         }
         Ok(())
     }
-    fn evaluate_event(&mut self, event: Event) {
+    fn evaluate_event(&mut self, event: &Event) {
         if let Key(KeyEvent {
             code, modifiers, ..
         }) = event
         {
             match code {
-                Char('q') if modifiers == KeyModifiers::CONTROL => {
+                Char('q') if *modifiers == KeyModifiers::CONTROL => {
                     self.should_quit = true;
                 }
                 _ => (),
