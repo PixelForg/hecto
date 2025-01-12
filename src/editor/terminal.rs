@@ -2,7 +2,7 @@ use std::io::{stdout, Error, Write};
 
 use crossterm::{
     cursor::{Hide, MoveTo, Show},
-    execute, queue,
+    queue,
     style::Print,
     terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearType},
 };
@@ -39,7 +39,7 @@ impl Terminal {
     }
     pub fn move_cursor_to(position: &Position) -> Result<(), Error> {
         // MoveTo must be executed otherwise it does nothing, it is just a struct
-        execute!(stdout(), MoveTo(position.x, position.y))?;
+        queue!(stdout(), MoveTo(position.x, position.y))?;
         Ok(())
     }
     pub fn hide_cursor() -> Result<(), Error> {
