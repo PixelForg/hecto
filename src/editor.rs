@@ -1,6 +1,6 @@
 mod terminal;
 use std::io::Error;
-use terminal::Terminal;
+use terminal::{Position, Size, Terminal};
 
 use crossterm::event::{
     read,
@@ -25,6 +25,7 @@ impl Editor {
     }
     fn repl(&mut self) -> Result<(), Error> {
         loop {
+            Terminal::hide_cursor()?;
             self.refresh_screen()?;
             if self.should_quit {
                 break;
@@ -48,11 +49,12 @@ impl Editor {
         }
     }
     fn draw_rows() -> Result<(), Error> {
-        let number_of_rows = Terminal::size()?.1;
-        for current_row in 0..number_of_rows {
-            print!("~");
-            if current_row + 1 < number_of_rows {
-                print!("\r\n");
+        let Size { height, .. } = Terminal::size()?;
+        for current_row in 0..height {
+            Terminal::clear_line()?;
+            Terminal::print("~")?;
+            if current_row + 1 < height {
+                Terminal::print("\r\n")?;
             }
         }
         Ok(())
@@ -60,11 +62,13 @@ impl Editor {
     fn refresh_screen(&self) -> Result<(), Error> {
         if self.should_quit {
             Terminal::clear_screen()?;
-            print!("Goodbye. \r\n");
+            Terminal::print("Goodbye. \r\n")?;
         } else {
             Self::draw_rows()?;
-            Terminal::move_cursor_to(0, 0)?;
+            Terminal::move_cursor_to(&Position { x: 0, y: 0 })?;
         }
+        Terminal::show_cursor()?;
+        Terminal::execute()?;
         Ok(())
     }
 }
