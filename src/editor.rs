@@ -9,6 +9,9 @@ use crossterm::event::{
     KeyEvent, KeyModifiers,
 };
 
+const NAME: &str = env!("CARGO_PKG_NAME");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 pub struct Editor {
     should_quit: bool,
 }
@@ -60,12 +63,18 @@ impl Editor {
         Ok(())
     }
     fn show_welcome_message() -> Result<(), Error> {
-        let Size { height,.. } = Terminal::size()?;
+        let height = Terminal::size()?.height;
+        let width = Terminal::size()?.width as usize;
+        let mut welcome_message = format!("{NAME} editor -- version {VERSION}");
+        let padding = (width - welcome_message.len()) / 2;
+        let spaces = " ".repeat(padding - 1);
+        welcome_message = format!("~{spaces}{welcome_message}");
+        welcome_message.truncate(width);
         Terminal::move_cursor_to(&Position {
-            x: 40,
-            y: height/3,
+            x: 0,
+            y: height / 3,
         })?;
-        Terminal::print("hecto editor -- version 0.1.0")?;
+        Terminal::print(&welcome_message)?;
         Ok(())
     }
     fn refresh_screen(&self) -> Result<(), Error> {

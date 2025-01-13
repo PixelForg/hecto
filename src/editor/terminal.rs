@@ -9,7 +9,6 @@ use crossterm::{
 
 pub struct Terminal {}
 
-#[allow(dead_code)]
 pub struct Size {
     pub height: u16,
     pub width: u16,
